@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Propose Day</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Floating hearts background */
+        .heart {
+            position: absolute;
+            color: rgba(255, 105, 180, 0.6);
+            font-size: 2rem;
+            animation: float 6s ease-in infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% {
+                bottom: -10vh;
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                bottom: 110vh;
+                opacity: 0;
+            }
+        }
+
+        .heading {
+            font-size: 3.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 4rem;
+            animation: glow 2s ease-in-out infinite;
+            letter-spacing: 2px;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 105, 180, 0.5);
+            }
+            50% {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 105, 180, 0.8);
+            }
+        }
+
+        .letter-container {
+            perspective: 1000px;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .letter-box {
+            width: 300px;
+            height: 200px;
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe0f0 100%);
+            border: 3px solid #ff69b4;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .letter-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 105, 180, 0.4);
+        }
+
+        .letter-box.opened {
+            animation: openLetter 0.8s ease forwards;
+        }
+
+        @keyframes openLetter {
+            0% {
+                transform: rotateX(0deg);
+            }
+            100% {
+                transform: rotateX(180deg);
+            }
+        }
+
+        .letter-flap {
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            border-radius: 5px 5px 0 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            transform-origin: top;
+        }
+
+        .letter-body {
+            width: 100%;
+            height: 40%;
+            background: white;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-radius: 0 0 5px 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .open-button {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            background: white;
+            color: #764ba2;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .open-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .open-button:active {
+            transform: scale(0.98);
+        }
+
+        .open-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            z-index: 10;
+            animation: slideIn 0.5s ease forwards;
+            max-width: 80%;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .close-message {
+            animation: slideOut 0.5s ease forwards;
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+            to {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+        }
+
+        .content {
+            text-align: center;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1 class="heading">Happy Propose Day</h1>
+        
+        <div class="letter-container">
+            <div class="letter-box" id="letterBox">
+                <div class="letter-flap">✉️</div>
+                <div class="letter-body">📄</div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="open-button" id="openBtn">Open Letter</button>
+            <button class="open-button" id="resetBtn">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        const letterBox = document.getElementById('letterBox');
+        const openBtn = document.getElementById('openBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        let isOpened = false;
+
+        // Create floating hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            heart.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(heart);
+
+            setTimeout(() => heart.remove(), 8000);
+        }
+
+        // Create hearts at intervals
+        setInterval(createHeart, 500);
+
+        // Open letter button
+        openBtn.addEventListener('click', () => {
+            if (!isOpened) {
+                letterBox.classList.add('opened');
+                isOpened = true;
+                openBtn.textContent = 'Opened';
+                openBtn.disabled = true;
+                
+                // Show message
+                showMessage("Will you be my Valentine? 💕");
+            }
+        });
+
+        // Reset button
+        resetBtn.addEventListener('click', () => {
+            letterBox.classList.remove('opened');
+            isOpened = false;
+            openBtn.textContent = 'Open Letter';
+            openBtn.disabled = false;
+        });
+
+        // Show message function
+        function showMessage(text) {
+            const msg = document.createElement('div');
+            msg.className = 'message';
+            msg.innerHTML = text;
+            document.body.appendChild(msg);
+
+            setTimeout(() => {
+                msg.classList.add('close-message');
+                setTimeout(() => msg.remove(), 500);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

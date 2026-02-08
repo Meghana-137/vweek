@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flip Book</title>
+    <style>
+        /* General Setup and Background */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+            /* Creates the split-screen background effect */
+            background: linear-gradient(90deg, #fff 50%, #4a1010 50%);
+        }
+
+        /* Hide the checkboxes used for click logic */
+        input {
+            display: none;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Flip Book Container */
+        .flip-book {
+            width: 360px;
+            height: 450px;
+            position: relative;
+            /* Necessary for the 3D depth of the flip */
+            /* border: 3px solid salmon ; */
+            perspective: 1500px;
+        }
+
+        /* Individual Page Container */
+        .flip {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: left;
+            /* Maintains 3D space for children */
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #000;
+        }
+
+
+        /* Front and Back of each page */
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: #fff;
+            box-sizing: border-box;
+            padding: 20px;
+            /* Hides the 'underneath' side when flipped */
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        /* The back starts rotated and behind the front */
+        .back {
+            transform: rotateY(180deg);
+            z-index: 99;
+            background-color: #f0f0f0;
+        }
+
+        /* Adds the shadow and page-crease effect */
+        .front {
+            box-shadow: inset 20px 0 50px rgba(0,0,0,0.2), 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Heart Animation Styles */
+        .heart-container {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 50%;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background-color: #0a0a0f;
+            z-index: -1;
+            box-shadow: inset -50px 0 100px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Show heart animation only on 9th page */
+        #c9:checked ~ .heart-container {
+            display: flex;
+        }
+
+        .heart-svg {
+            width: 280px;
+            height: 280px;
+            filter: drop-shadow(0 0 10px rgba(255, 45, 149, 0.3)) 
+                    drop-shadow(0 0 20px rgba(0, 210, 255, 0.3));
+        }
+
+        .path {
+            fill: none;
+            stroke-width: 0.8;
+            stroke-linecap: round;
+            stroke-dasharray: 100; 
+            animation: drawHeart 2.5s linear infinite;
+        }
+
+        .pink-side {
+            stroke: #ff2d95;
+            filter: drop-shadow(0 0 8px #ff2d95) drop-shadow(0 0 15px #ff2d95);
+        }
+
+        .blue-side {
+            stroke: #00d2ff;
+            filter: drop-shadow(0 0 8px #00d2ff) drop-shadow(0 0 15px #00d2ff);
+            animation-delay: -1s;
+        }
+
+        @keyframes drawHeart {
+            0% {
+                stroke-dashoffset: 0;
+            }
+            100% {
+                stroke-dashoffset: 200;
+            }
+        }
+
+        /* Navigation Buttons (Labels) */
+        .next-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #4a1010;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        /* Initial Page Layering */
+        #p1 { z-index: 10; }
+        #p2 { z-index: 9; }
+        #p3 { z-index: 8; }
+        #p4 { z-index: 7; }
+        #p5 { z-index: 6; }
+        #p6 { z-index: 5; }
+        #p7 { z-index: 4; }
+        #p8 { z-index: 3; }
+        #p9 { z-index: 2; }
+        #p10 { z-index: 1; }
+
+        /* Flip Logic: When checkbox is checked, rotate the page */
+        /* When a page is flipped, send it behind all other pages
+           so later pages remain visible on top. Using a single low
+           z-index avoids cycling overlaps that cause repeated images. */
+        #c1:checked ~ .flip-book #p1,
+        #c2:checked ~ .flip-book #p2,
+        #c3:checked ~ .flip-book #p3,
+        #c4:checked ~ .flip-book #p4,
+        #c5:checked ~ .flip-book #p5,
+        #c6:checked ~ .flip-book #p6,
+        #c7:checked ~ .flip-book #p7,
+        #c8:checked ~ .flip-book #p8,
+        #c9:checked ~ .flip-book #p9 {
+            transform: rotateY(-180deg);
+            z-index: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <input type="checkbox" id="c1">
+    <input type="checkbox" id="c2">
+    <input type="checkbox" id="c3">
+    <input type="checkbox" id="c4">
+    <input type="checkbox" id="c5">
+    <input type="checkbox" id="c6">
+    <input type="checkbox" id="c7">
+    <input type="checkbox" id="c8">
+    <input type="checkbox" id="c9">
+    <input type="checkbox" id="c10">
+
+    <!-- Heart Animation Container -->
+    <div class="heart-container">
+        <svg class="heart-svg" viewBox="0 0 32 32">
+            <path class="path pink-side" d="M16 28.5C16 28.5 3 20.5 3 11.5C3 6.5 7 4.5 10.5 4.5C13 4.5 14.5 5.5 16 7.5" />
+            <path class="path blue-side" d="M16 7.5C17.5 5.5 19 4.5 21.5 4.5C25 4.5 29 6.5 29 11.5C29 20.5 16 28.5 16 28.5" />
+        </svg>
+    </div>
+
+    <div class="flip-book">
+        
+        <div class="flip" id="p1">
+            <div class="back">
+                <img src="i2.png" alt="Cover image">
+            </div>
+            <div class="front">
+                <h2>Happy Valentine’s Week</h2>
+                <p>A week of little moments, just for you.</p>
+                <label class="next-btn" for="c1">Next</label>
+            </div>
+        </div>
+
+        <div class="flip" id="p2">
+            <div class="back">
+                <img src="m1.jpeg" alt="Rose Day image">
+            </div>
+            <div class="front">
+                <h2>Rose Day</h2>
+                <p>A rose for every reason I love you.</p>
+                <label class="next-btn" for="c2">Next</label>
+            </div>
+        </div>
+
+        <div class="flip" id="p3">
+            <div class="back">
+                <img src="i1.png" alt="Propose Day image">
+            </div>
+            <div class="front">
+                <h2>Propose Day</h2>
+                <p>Will you be mine? </p>
+                <label class="next-btn" for="c3">Next</label>
+            </div>
+        </div>
+
+        <div class="flip" id="p4">
+            <div class="back">
+                <img src="m2.jpeg" alt="Chocolate Day image">
+            </div>
+            <div class="front">
+                <h2>Chocolate Day</h2>
+                <p>Sweet moments, sweeter with you.</p>
+                <label class="next-btn" for="c4">Next</label>
+            </div>
+        </div>
+
+        <div class="flip" id="p5">
+            <div class="back">
+                <img src="i4.png" alt="Teddy Day image">
+            </div>
+            <div class="front">
+                <h2>Teddy Day</h2>
+                <p>A little hug when I can't be there.</p>
+                <label class="next-btn" for="c5">Next</label>
+            </div>
+        </div>
+
+        <div class="flip" id="p6">
+            <div class="back">
+                <img src="m3.jpeg" alt="Promise Day image">
+            </div>
+            <div class="front">
+                <h2>Promise Day</h2>
+                <p>My promises: listen, support, laugh, and be there.</p>
+                <label class="next-btn" for="c6">Next</label>
+            </div>
+        </div>
+
+        <div class="flip" id="p7">
+            <div class="back">
+                <img src="coup.jpeg" alt="Hug Day image">
+            </div>
+            <div class="front">
+                <h2>Hug Day</h2>
+                <p>Saving a hug for you—open when you need one.</p>
+                <label class="next-btn" for="c7">Next</label>
+            </div>
+        </div>
+
+        <div class="flip" id="p8">
+            <div class="back">
+                <img src="i5.png" alt="Kiss Day image">
+            </div>
+            <div class="front">
+                <h2>Kiss Day</h2>
+                <p>One kiss for every memory we share.</p>
+                <label class="next-btn" for="c8">Next</label>
+            </div>
+        </div>
+
+        <div class="flip" id="p9">
+            <div class="back">
+                <img src="m7.jpeg" alt="Valentine image">
+            </div>
+                <div class="front">
+                        <h2>Happy Valentine's Day</h2>
+                        <p>
+                            My love,
+                        </p>
+                        <p>
+                            I still remember when we first met—the way you smiled and the way time stopped. I love your laugh, your kindness, and the way you make ordinary days special. Let's make more memories together.
+                        </p>
+                        <label class="next-btn" for="c9">Next</label>
+                </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
